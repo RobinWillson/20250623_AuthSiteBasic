@@ -10,18 +10,8 @@ Of course there is admin account that can manager member status.
 
 # website require
 - project name : 20250623_AuthSiteBasic
-- start by docker
 - nodejs base
 - react 
 - material ui 
+- tailwind css
 
-
-# Project Structure
-
-Create a new directory for the project and initialize a new Node.js project using `npm init`.
-
-Create the following subdirectories:
-
-* `client`: for the React frontend
-* `server`: for the Node.js backend
-* `docker`: for Docker configuration files
