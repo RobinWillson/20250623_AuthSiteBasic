@@ -1,76 +1,68 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Select,
-  MenuItem
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { AppBar, Toolbar, Typography, Button, Avatar } from '@mui/material';
 
 const AdminDashboard = () => {
-  const [users, setUsers] = useState([
-    { id: 1, email: 'admin@example.com', role: 'admin' },
-    { id: 2, email: 'user1@example.com', role: 'free' },
-    { id: 3, email: 'user2@example.com', role: 'free' },
-  ]);
+  const [user, setUser] = useState(null);
 
-  const handleRoleChange = (userId, newRole) => {
-    setUsers(users.map(user =>
-      user.id === userId ? { ...user, role: newRole } : user
-    ));
-    // TODO: Connect to backend API
+  useEffect(() => {
+    // Fetch user data from backend
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/current-user', {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = () => {
+    window.location.href = 'http://localhost:5000/logout';
   };
 
   return (
-    <Box sx={ { padding: 3 } }>
-      <Typography variant="h4" gutterBottom>
-        Admin Dashboard
-      </Typography>
+    <div>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={ { flexGrow: 1 } }>
+            ERP Admin Dashboard
+          </Typography>
+          { user && (
+            <div style={ { display: 'flex', alignItems: 'center' } }>
+              <Avatar
+                src={ user.avatar }
+                alt={ user.displayName }
+                sx={ { width: 32, height: 32, marginRight: 1 } }
+              />
+              <Typography variant="subtitle1" sx={ { marginRight: 2 } }>
+                { user.displayName }
+              </Typography>
+              <Button color="inherit" onClick={ handleLogout }>
+                Logout
+              </Button>
+            </div>
+          ) }
+        </Toolbar>
+      </AppBar>
 
-      <TableContainer component={ Paper }>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            { users.map((user) => (
-              <TableRow key={ user.id }>
-                <TableCell>{ user.id }</TableCell>
-                <TableCell>{ user.email }</TableCell>
-                <TableCell>
-                  <Select
-                    value={ user.role }
-                    onChange={ (e) => handleRoleChange(user.id, e.target.value) }
-                    size="small"
-                  >
-                    <MenuItem value="free">Free</MenuItem>
-                    <MenuItem value="paid">Paid</MenuItem>
-                    <MenuItem value="admin">Admin</MenuItem>
-                  </Select>
-                </TableCell>
-                <TableCell>
-                  <Button variant="outlined" color="primary">
-                    Save
-                  </Button>
-                </TableCell>
-              </TableRow>
-            )) }
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+      <div className="p-6">
+        <Typography variant="h4" gutterBottom>
+          Welcome to the Admin Dashboard
+        </Typography>
+        <Typography paragraph>
+          This is the main administration interface for the ERP system.
+          Here you can manage users, products, orders, and other business operations.
+        </Typography>
+      </div>
+    </div>
   );
 };
 
